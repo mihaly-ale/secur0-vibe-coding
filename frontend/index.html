@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Gestor de notas privadas seguro" />
+  <meta name="theme-color" content="#0d0f12" />
+  <title>Notes Manager</title>
+
+  <!-- Preconnect for fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+  <link rel="stylesheet" href="styles.css" />
+
+  <!-- Favicon inline SVG -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='28'>📒</text></svg>" />
+</head>
+<body>
+
+<!-- ── Loading Overlay ──────────────────────────────────────── -->
+<div id="loading-overlay" class="flex-center" style="flex-direction:column; gap:16px;">
+  <div class="loader"></div>
+  <span style="color:var(--text-muted); font-size:0.85rem;">Cargando...</span>
+</div>
+
+<!-- ── Toast Container ──────────────────────────────────────── -->
+<div id="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     AUTH SCREEN
+════════════════════════════════════════════════════════════════ -->
+<div id="auth-screen" class="hidden">
+  <div class="auth-card">
+
+    <div class="auth-logo">
+      <div class="auth-logo-icon">📒</div>
+      <div class="auth-logo-text">Notes Manager</div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="auth-tabs" role="tablist">
+      <button class="auth-tab active" data-tab="login" role="tab" aria-selected="true">Iniciar sesión</button>
+      <button class="auth-tab" data-tab="register" role="tab" aria-selected="false">Crear cuenta</button>
+    </div>
+
+    <!-- Login Form -->
+    <form id="login-form" novalidate>
+      <div class="form-group">
+        <label class="form-label" for="login-email">Email</label>
+        <input class="form-input" type="email" id="login-email" name="email"
+               placeholder="tu@email.com" autocomplete="email" required />
+        <div class="form-error" id="login-email-error" role="alert"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="login-password">Contraseña</label>
+        <input class="form-input" type="password" id="login-password" name="password"
+               placeholder="••••••••" autocomplete="current-password" required />
+        <div class="form-error" id="login-password-error" role="alert"></div>
+      </div>
+      <button type="submit" class="btn btn-primary" style="margin-top:8px;">
+        Iniciar sesión
+      </button>
+    </form>
+
+    <!-- Register Form -->
+    <form id="register-form" class="hidden" novalidate>
+      <div class="form-group">
+        <label class="form-label" for="reg-username">Nombre de usuario</label>
+        <input class="form-input" type="text" id="reg-username" name="username"
+               placeholder="johndoe" autocomplete="username" required
+               minlength="3" maxlength="30" />
+        <div class="form-error" id="reg-username-error" role="alert"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="reg-email">Email</label>
+        <input class="form-input" type="email" id="reg-email" name="email"
+               placeholder="tu@email.com" autocomplete="email" required />
+        <div class="form-error" id="reg-email-error" role="alert"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="reg-password">Contraseña</label>
+        <input class="form-input" type="password" id="reg-password" name="password"
+               placeholder="Mínimo 8 caracteres" autocomplete="new-password"
+               required minlength="8" />
+        <div class="form-error" id="reg-password-error" role="alert"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="reg-confirm">Confirmar contraseña</label>
+        <input class="form-input" type="password" id="reg-confirm" name="confirm"
+               placeholder="Repite la contraseña" autocomplete="new-password" required />
+        <div class="form-error" id="reg-confirm-error" role="alert"></div>
+      </div>
+      <button type="submit" class="btn btn-primary" style="margin-top:8px;">
+        Crear cuenta
+      </button>
+    </form>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     APP SCREEN
+════════════════════════════════════════════════════════════════ -->
+<div id="app-screen" class="hidden">
+
+  <!-- Mobile backdrop -->
+  <div class="sidebar-backdrop"></div>
+
+  <!-- ── Sidebar ──────────────────────────────────────────── -->
+  <aside class="sidebar" aria-label="Navegación principal">
+
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <div class="sidebar-logo-icon">📒</div>
+        <div class="sidebar-logo-text">Notes Manager</div>
+      </div>
+      <div class="search-box">
+        <span class="search-icon" aria-hidden="true">🔍</span>
+        <input type="search" id="search-input" class="search-input"
+               placeholder="Buscar notas..." aria-label="Buscar notas" />
+      </div>
+    </div>
+
+    <nav class="sidebar-nav" aria-label="Vistas">
+      <span class="sidebar-section">Notas</span>
+
+      <button class="nav-item active" data-view="all" aria-current="page">
+        <span class="nav-icon" aria-hidden="true">📄</span>
+        <span class="nav-label">Todas</span>
+        <span class="nav-count" id="count-all">0</span>
+      </button>
+
+      <button class="nav-item" data-view="pinned">
+        <span class="nav-icon" aria-hidden="true">📌</span>
+        <span class="nav-label">Fijadas</span>
+        <span class="nav-count" id="count-pinned">0</span>
+      </button>
+
+      <span class="sidebar-section">Archivo</span>
+
+      <button class="nav-item" data-view="archived">
+        <span class="nav-icon" aria-hidden="true">📦</span>
+        <span class="nav-label">Archivadas</span>
+        <span class="nav-count" id="count-archived">0</span>
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-info" id="user-info-btn" aria-label="Opciones de usuario">
+        <div class="user-avatar" id="user-avatar" aria-hidden="true">?</div>
+        <div style="min-width:0; flex:1;">
+          <div class="user-name" id="user-name">...</div>
+          <div class="user-email" id="user-email">...</div>
+        </div>
+        <button class="btn-icon btn" id="settings-btn" title="Ajustes" aria-label="Abrir ajustes">⚙️</button>
+        <button class="btn-icon btn" id="logout-btn" title="Cerrar sesión" aria-label="Cerrar sesión">🚪</button>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- ── Main Content ──────────────────────────────────────── -->
+  <main class="main-content">
+
+    <header class="topbar">
+      <!-- Mobile menu button -->
+      <button class="btn btn-icon menu-toggle" aria-label="Abrir menú">☰</button>
+      <h1 class="topbar-title" id="topbar-title">Todas las notas</h1>
+      <div class="topbar-actions">
+        <button class="btn btn-primary btn-sm" id="new-note-btn" aria-label="Crear nueva nota">
+          + Nueva nota
+        </button>
+      </div>
+    </header>
+
+    <section class="notes-area" aria-label="Notas">
+      <!-- Notes Grid -->
+      <div class="notes-grid" id="notes-grid" role="list" aria-label="Lista de notas"></div>
+
+      <!-- Empty State -->
+      <div id="empty-state" class="empty-state hidden" aria-live="polite">
+        <div class="empty-icon" id="empty-icon">📒</div>
+        <div class="empty-title" id="empty-title">Sin notas</div>
+        <div class="empty-sub" id="empty-sub">Crea tu primera nota pulsando el botón + Nueva nota</div>
+      </div>
+    </section>
+
+  </main>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     NOTE MODAL (create / edit)
+════════════════════════════════════════════════════════════════ -->
+<div id="note-modal" class="modal-overlay hidden" role="dialog"
+     aria-modal="true" aria-labelledby="note-modal-title">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 class="modal-title" id="note-modal-title">Nueva nota</h2>
+      <button class="btn btn-icon" id="close-note-modal" aria-label="Cerrar">✕</button>
+    </div>
+    <div class="modal-body">
+      <textarea class="note-title-input" id="note-title-input"
+                placeholder="Título de la nota" maxlength="200"
+                rows="1" aria-label="Título" style="resize:none; overflow:hidden;"></textarea>
+      <div class="char-counter" id="title-counter">0/200</div>
+
+      <div class="divider"></div>
+
+      <textarea class="note-content-input" id="note-content-input"
+                placeholder="Escribe el contenido de tu nota aquí..."
+                maxlength="50000" aria-label="Contenido de la nota"></textarea>
+      <div class="char-counter" id="content-counter">0/50000</div>
+
+      <div class="divider"></div>
+
+      <div style="margin-top:4px;">
+        <label class="form-label">Color de la nota</label>
+        <div class="color-picker" id="color-picker" role="group" aria-label="Color de nota"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeNoteModal()">Cancelar</button>
+      <button class="btn btn-primary" id="save-note-btn">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     CONFIRM DIALOG
+════════════════════════════════════════════════════════════════ -->
+<div id="confirm-modal" class="modal-overlay confirm-modal hidden"
+     role="dialog" aria-modal="true" aria-labelledby="confirm-title">
+  <div class="modal" style="max-width:380px;">
+    <div class="modal-header">
+      <h2 class="modal-title" id="confirm-title">Confirmar</h2>
+    </div>
+    <div class="modal-body">
+      <p class="confirm-text" id="confirm-text"></p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" id="confirm-cancel-btn">Cancelar</button>
+      <button class="btn btn-danger" id="confirm-ok-btn">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     SETTINGS MODAL
+════════════════════════════════════════════════════════════════ -->
+<div id="settings-modal" class="modal-overlay hidden"
+     role="dialog" aria-modal="true" aria-labelledby="settings-heading">
+  <div class="modal" style="max-width:500px;">
+    <div class="modal-header">
+      <h2 class="modal-title" id="settings-heading">⚙️ Ajustes</h2>
+      <button class="btn btn-icon" id="close-settings-btn" aria-label="Cerrar ajustes">✕</button>
+    </div>
+    <div class="modal-body">
+
+      <!-- Profile Info -->
+      <div class="settings-section">
+        <div class="settings-section-title">Perfil</div>
+        <div style="display:flex; flex-direction:column; gap:6px; font-size:0.875rem; background:var(--bg); padding:14px; border-radius:var(--radius-sm); border:1px solid var(--border);">
+          <div><span style="color:var(--text-muted);">Usuario: </span><strong id="settings-username"></strong></div>
+          <div><span style="color:var(--text-muted);">Email: </span><strong id="settings-email"></strong></div>
+          <div><span style="color:var(--text-muted);">Miembro desde: </span><strong id="settings-created"></strong></div>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="settings-section">
+        <div class="settings-section-title">Estadísticas</div>
+        <div class="stat-grid">
+          <div class="stat-card">
+            <div class="stat-value" id="stat-total">0</div>
+            <div class="stat-label">Total</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="stat-active">0</div>
+            <div class="stat-label">Activas</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="stat-pinned">0</div>
+            <div class="stat-label">Fijadas</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="stat-archived">0</div>
+            <div class="stat-label">Archivadas</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Change Password -->
+      <div class="settings-section">
+        <div class="settings-section-title">Cambiar contraseña</div>
+        <form id="change-password-form" novalidate>
+          <div class="form-group">
+            <label class="form-label" for="current-password">Contraseña actual</label>
+            <input class="form-input" type="password" id="current-password"
+                   autocomplete="current-password" placeholder="••••••••" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="new-password">Nueva contraseña</label>
+            <input class="form-input" type="password" id="new-password"
+                   autocomplete="new-password" placeholder="Mínimo 8 caracteres" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="confirm-password">Confirmar nueva contraseña</label>
+            <input class="form-input" type="password" id="confirm-password"
+                   autocomplete="new-password" placeholder="Repite la contraseña" required />
+          </div>
+          <button type="submit" class="btn btn-secondary btn-sm">Actualizar contraseña</button>
+        </form>
+      </div>
+
+      <!-- Danger Zone -->
+      <div class="settings-section">
+        <div class="settings-section-title" style="color:var(--danger);">Zona peligrosa</div>
+        <button class="btn btn-danger btn-sm" id="delete-account-btn">
+          Eliminar cuenta permanentemente
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
