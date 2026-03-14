@@ -36,6 +36,7 @@ notes-manager/
 
 - Node.js >= 18.x
 - npm >= 9.x
+
   **Nota:** El proyecto está probado con Node.js 20.20.1. Con versiones más nuevas pueden aparecer errores por compatibilidad.
 
 ### 2. Configurar entorno
