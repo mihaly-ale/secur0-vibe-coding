@@ -33,8 +33,10 @@ notes-manager/
 ## ⚙️ Instalación rápida
 
 ### 1. Requisitos
+
 - Node.js >= 18.x
 - npm >= 9.x
+  **Nota:** El proyecto está probado con Node.js 20.20.1. Con versiones más nuevas pueden aparecer errores por compatibilidad.
 
 ### 2. Configurar entorno
 
@@ -55,11 +57,13 @@ npm install
 ### 4. Iniciar el servidor
 
 **Modo desarrollo (con auto-reload):**
+
 ```bash
 npm run dev
 ```
 
 **Modo producción:**
+
 ```bash
 npm start
 ```
@@ -72,46 +76,49 @@ Visita → **http://localhost:3000**
 
 ## 🔐 Seguridad implementada
 
-| Capa              | Medida                                                  |
-|-------------------|---------------------------------------------------------|
-| **Autenticación** | JWT HS256 con expiración configurable                   |
-| **Contraseñas**   | bcrypt con 12 rounds de sal                             |
-| **Rate limiting** | 200 req/15min global; 15 intentos auth/15min            |
-| **Headers HTTP**  | Helmet (CSP, HSTS, X-Frame-Options, etc.)               |
-| **CORS**          | Lista blanca de orígenes configurables                  |
-| **Validación**    | express-validator en todos los endpoints                |
-| **Sanitización**  | XSS filtering en títulos y contenidos                   |
-| **SQL Injection** | Consultas parametrizadas (never string concat)          |
-| **Timing attacks**| Comparación constante de contraseñas aunque no exista el usuario |
-| **Propiedad**     | Todas las operaciones verifican `user_id` en BD         |
+| Capa               | Medida                                                           |
+| ------------------ | ---------------------------------------------------------------- |
+| **Autenticación**  | JWT HS256 con expiración configurable                            |
+| **Contraseñas**    | bcrypt con 12 rounds de sal                                      |
+| **Rate limiting**  | 200 req/15min global; 15 intentos auth/15min                     |
+| **Headers HTTP**   | Helmet (CSP, HSTS, X-Frame-Options, etc.)                        |
+| **CORS**           | Lista blanca de orígenes configurables                           |
+| **Validación**     | express-validator en todos los endpoints                         |
+| **Sanitización**   | XSS filtering en títulos y contenidos                            |
+| **SQL Injection**  | Consultas parametrizadas (never string concat)                   |
+| **Timing attacks** | Comparación constante de contraseñas aunque no exista el usuario |
+| **Propiedad**      | Todas las operaciones verifican `user_id` en BD                  |
 
 ---
 
 ## 📡 API Reference
 
 ### Auth
-| Método | Endpoint                  | Body                                    | Auth |
-|--------|---------------------------|-----------------------------------------|------|
-| POST   | /api/auth/register        | `username, email, password`             | No   |
-| POST   | /api/auth/login           | `email, password`                       | No   |
-| GET    | /api/auth/me              | —                                       | Sí   |
-| PUT    | /api/auth/change-password | `currentPassword, newPassword`          | Sí   |
-| DELETE | /api/auth/account         | `password`                              | Sí   |
+
+| Método | Endpoint                  | Body                           | Auth |
+| ------ | ------------------------- | ------------------------------ | ---- |
+| POST   | /api/auth/register        | `username, email, password`    | No   |
+| POST   | /api/auth/login           | `email, password`              | No   |
+| GET    | /api/auth/me              | —                              | Sí   |
+| PUT    | /api/auth/change-password | `currentPassword, newPassword` | Sí   |
+| DELETE | /api/auth/account         | `password`                     | Sí   |
 
 ### Notes
-| Método | Endpoint               | Descripción                       | Auth |
-|--------|------------------------|-----------------------------------|------|
-| GET    | /api/notes             | Listar notas (soporta ?q= y ?archived=true) | Sí |
-| GET    | /api/notes/:id         | Obtener nota por ID               | Sí   |
-| POST   | /api/notes             | Crear nota                        | Sí   |
-| PUT    | /api/notes/:id         | Actualizar nota                   | Sí   |
-| PATCH  | /api/notes/:id/pin     | Toggle fijar/desfijar             | Sí   |
-| PATCH  | /api/notes/:id/archive | Toggle archivar/restaurar         | Sí   |
-| DELETE | /api/notes/:id         | Eliminar nota                     | Sí   |
+
+| Método | Endpoint               | Descripción                                 | Auth |
+| ------ | ---------------------- | ------------------------------------------- | ---- |
+| GET    | /api/notes             | Listar notas (soporta ?q= y ?archived=true) | Sí   |
+| GET    | /api/notes/:id         | Obtener nota por ID                         | Sí   |
+| POST   | /api/notes             | Crear nota                                  | Sí   |
+| PUT    | /api/notes/:id         | Actualizar nota                             | Sí   |
+| PATCH  | /api/notes/:id/pin     | Toggle fijar/desfijar                       | Sí   |
+| PATCH  | /api/notes/:id/archive | Toggle archivar/restaurar                   | Sí   |
+| DELETE | /api/notes/:id         | Eliminar nota                               | Sí   |
 
 ### Health
-| Método | Endpoint    | Descripción        |
-|--------|-------------|--------------------|
+
+| Método | Endpoint    | Descripción         |
+| ------ | ----------- | ------------------- |
 | GET    | /api/health | Estado del servidor |
 
 ---
@@ -137,11 +144,11 @@ Visita → **http://localhost:3000**
 
 ## ⌨️ Atajos de teclado
 
-| Atajo         | Acción            |
-|---------------|-------------------|
-| `Ctrl + N`    | Nueva nota        |
-| `Ctrl + S`    | Guardar nota      |
-| `Esc`         | Cerrar modal      |
+| Atajo      | Acción       |
+| ---------- | ------------ |
+| `Ctrl + N` | Nueva nota   |
+| `Ctrl + S` | Guardar nota |
+| `Esc`      | Cerrar modal |
 
 ---
 
@@ -157,14 +164,14 @@ refresh_tokens (id, user_id, token_hash, expires_at, created_at)
 
 ## 📋 Variables de entorno
 
-| Variable               | Default          | Descripción                              |
-|------------------------|------------------|------------------------------------------|
-| `PORT`                 | `3000`           | Puerto del servidor                      |
-| `NODE_ENV`             | `development`    | Entorno (`development` / `production`)   |
-| `JWT_SECRET`           | —                | **Cambiar obligatoriamente en producción** |
-| `JWT_EXPIRES_IN`       | `7d`             | Duración del token                       |
-| `DB_PATH`              | `./data/notes.db`| Ruta del archivo SQLite                  |
-| `RATE_LIMIT_WINDOW_MS` | `900000`         | Ventana rate limit (ms)                  |
-| `RATE_LIMIT_MAX`       | `200`            | Máx. requests por ventana                |
-| `AUTH_RATE_LIMIT_MAX`  | `15`             | Máx. intentos de auth por ventana        |
-| `ALLOWED_ORIGINS`      | `http://localhost:3000` | Orígenes CORS permitidos (CSV)    |
+| Variable               | Default                 | Descripción                                |
+| ---------------------- | ----------------------- | ------------------------------------------ |
+| `PORT`                 | `3000`                  | Puerto del servidor                        |
+| `NODE_ENV`             | `development`           | Entorno (`development` / `production`)     |
+| `JWT_SECRET`           | —                       | **Cambiar obligatoriamente en producción** |
+| `JWT_EXPIRES_IN`       | `7d`                    | Duración del token                         |
+| `DB_PATH`              | `./data/notes.db`       | Ruta del archivo SQLite                    |
+| `RATE_LIMIT_WINDOW_MS` | `900000`                | Ventana rate limit (ms)                    |
+| `RATE_LIMIT_MAX`       | `200`                   | Máx. requests por ventana                  |
+| `AUTH_RATE_LIMIT_MAX`  | `15`                    | Máx. intentos de auth por ventana          |
+| `ALLOWED_ORIGINS`      | `http://localhost:3000` | Orígenes CORS permitidos (CSV)             |
