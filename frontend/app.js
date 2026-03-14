@@ -164,6 +164,65 @@ function showFieldError(fieldId, msg) {
   if (error) { error.textContent = msg; error.classList.add('visible'); }
 }
 
+function hideFieldError(fieldId) {
+  const input = document.getElementById(fieldId);
+  const error = document.getElementById(`${fieldId}-error`);
+  if (input) input.classList.remove('error');
+  if (error) { error.textContent = ''; error.classList.remove('visible'); }
+}
+
+function setupPasswordRevealButtons() {
+  document.querySelectorAll('.toggle-password').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const target = document.getElementById(btn.dataset.target);
+      if (!target) return;
+      const isPassword = target.type === 'password';
+      target.type = isPassword ? 'text' : 'password';
+      btn.textContent = isPassword ? '🙈' : '👁';
+      btn.setAttribute('aria-label', isPassword ? 'Ocultar contraseña' : 'Mostrar contraseña');
+    });
+  });
+}
+
+function setupPasswordMatchWatcher() {
+  const regPassword = document.getElementById('reg-password');
+  const regConfirm = document.getElementById('reg-confirm');
+  const regMismatch = () => {
+    if (!regPassword || !regConfirm) return;
+    if (!regConfirm.value) {
+      hideFieldError('reg-confirm');
+      return;
+    }
+    if (regPassword.value !== regConfirm.value) {
+      showFieldError('reg-confirm', 'Las contraseñas no coinciden.');
+    } else {
+      hideFieldError('reg-confirm');
+    }
+  };
+  regPassword?.addEventListener('input', regMismatch);
+  regConfirm?.addEventListener('input', regMismatch);
+
+  const newPassword = document.getElementById('new-password');
+  const confirmPassword = document.getElementById('confirm-password');
+  const changeMismatch = () => {
+    if (!newPassword || !confirmPassword) return;
+    if (!confirmPassword.value) {
+      hideFieldError('confirm-password');
+      return;
+    }
+    if (newPassword.value !== confirmPassword.value) {
+      showFieldError('confirm-password', 'Las contraseñas no coinciden.');
+    } else {
+      hideFieldError('confirm-password');
+    }
+  };
+  newPassword?.addEventListener('input', changeMismatch);
+  confirmPassword?.addEventListener('input', changeMismatch);
+}
+
+setupPasswordRevealButtons();
+setupPasswordMatchWatcher();
+
 // Login
 document.getElementById('login-form').addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -598,8 +657,19 @@ document.getElementById('change-password-form').addEventListener('submit', async
   const newPass = document.getElementById('new-password').value;
   const confirm = document.getElementById('confirm-password').value;
 
-  if (newPass !== confirm) return toast('Las contraseñas no coinciden.', 'error');
-  if (newPass.length < 8) return toast('La nueva contraseña debe tener al menos 8 caracteres.', 'error');
+  clearFormErrors();
+  if (!current) {
+    showFieldError('current-password', 'La contraseña actual es requerida.');
+    return;
+  }
+  if (newPass.length < 8) {
+    showFieldError('new-password', 'La nueva contraseña debe tener al menos 8 caracteres.');
+    return;
+  }
+  if (newPass !== confirm) {
+    showFieldError('confirm-password', 'Las contraseñas no coinciden.');
+    return;
+  }
 
   btn.disabled = true;
   btn.classList.add('btn-loading');

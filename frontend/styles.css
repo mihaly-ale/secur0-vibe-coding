@@ -185,7 +185,32 @@ body {
   letter-spacing: 0.3px;
   text-transform: uppercase;
 }
+.password-wrapper {
+  position: relative;
+}
 
+.toggle-password {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 0.9rem;
+  border-radius: 4px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.toggle-password:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-primary);
+}
 .form-input {
   width: 100%;
   padding: 11px 14px;

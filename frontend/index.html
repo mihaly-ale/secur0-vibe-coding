@@ -54,8 +54,11 @@
       </div>
       <div class="form-group">
         <label class="form-label" for="login-password">Contraseña</label>
-        <input class="form-input" type="password" id="login-password" name="password"
-               placeholder="••••••••" autocomplete="current-password" required />
+        <div class="password-wrapper">
+          <input class="form-input" type="password" id="login-password" name="password"
+                 placeholder="••••••••" autocomplete="current-password" required />
+          <button type="button" class="toggle-password" data-target="login-password" aria-label="Mostrar contraseña">👁</button>
+        </div>
         <div class="form-error" id="login-password-error" role="alert"></div>
       </div>
       <button type="submit" class="btn btn-primary" style="margin-top:8px;">
@@ -80,15 +83,21 @@
       </div>
       <div class="form-group">
         <label class="form-label" for="reg-password">Contraseña</label>
-        <input class="form-input" type="password" id="reg-password" name="password"
-               placeholder="Mínimo 8 caracteres" autocomplete="new-password"
-               required minlength="8" />
+        <div class="password-wrapper">
+          <input class="form-input" type="password" id="reg-password" name="password"
+                 placeholder="Mínimo 8 caracteres" autocomplete="new-password"
+                 required minlength="8" />
+          <button type="button" class="toggle-password" data-target="reg-password" aria-label="Mostrar contraseña">👁</button>
+        </div>
         <div class="form-error" id="reg-password-error" role="alert"></div>
       </div>
       <div class="form-group">
         <label class="form-label" for="reg-confirm">Confirmar contraseña</label>
-        <input class="form-input" type="password" id="reg-confirm" name="confirm"
-               placeholder="Repite la contraseña" autocomplete="new-password" required />
+        <div class="password-wrapper">
+          <input class="form-input" type="password" id="reg-confirm" name="confirm"
+                 placeholder="Repite la contraseña" autocomplete="new-password" required />
+          <button type="button" class="toggle-password" data-target="reg-confirm" aria-label="Mostrar contraseña">👁</button>
+        </div>
         <div class="form-error" id="reg-confirm-error" role="alert"></div>
       </div>
       <button type="submit" class="btn btn-primary" style="margin-top:8px;">
@@ -297,18 +306,30 @@
         <form id="change-password-form" novalidate>
           <div class="form-group">
             <label class="form-label" for="current-password">Contraseña actual</label>
-            <input class="form-input" type="password" id="current-password"
-                   autocomplete="current-password" placeholder="••••••••" required />
+            <div class="password-wrapper">
+              <input class="form-input" type="password" id="current-password"
+                     autocomplete="current-password" placeholder="••••••••" required />
+              <button type="button" class="toggle-password" data-target="current-password" aria-label="Mostrar contraseña">👁</button>
+            </div>
+            <div class="form-error" id="current-password-error" role="alert"></div>
           </div>
           <div class="form-group">
             <label class="form-label" for="new-password">Nueva contraseña</label>
-            <input class="form-input" type="password" id="new-password"
-                   autocomplete="new-password" placeholder="Mínimo 8 caracteres" required />
+            <div class="password-wrapper">
+              <input class="form-input" type="password" id="new-password"
+                     autocomplete="new-password" placeholder="Mínimo 8 caracteres" required />
+              <button type="button" class="toggle-password" data-target="new-password" aria-label="Mostrar contraseña">👁</button>
+            </div>
+            <div class="form-error" id="new-password-error" role="alert"></div>
           </div>
           <div class="form-group">
             <label class="form-label" for="confirm-password">Confirmar nueva contraseña</label>
-            <input class="form-input" type="password" id="confirm-password"
-                   autocomplete="new-password" placeholder="Repite la contraseña" required />
+            <div class="password-wrapper">
+              <input class="form-input" type="password" id="confirm-password"
+                     autocomplete="new-password" placeholder="Repite la contraseña" required />
+              <button type="button" class="toggle-password" data-target="confirm-password" aria-label="Mostrar contraseña">👁</button>
+            </div>
+            <div class="form-error" id="confirm-password-error" role="alert"></div>
           </div>
           <button type="submit" class="btn btn-secondary btn-sm">Actualizar contraseña</button>
         </form>
