@@ -6,7 +6,7 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { getDB } = require('../backend/database');
+const { getDB } = require('../database');
 const { authenticate } = require('../middleware/auth');
 const { validateRegister, validateLogin } = require('../middleware/validation');
 
@@ -23,7 +23,7 @@ function generateToken(user) {
 	return jwt.sign(
 		{ id: user.id, username: user.username, email: user.email },
 		JWT_SECRET,
-		{ algorithm: 'HS256', expiresIn: JWT_EXPIRES_IN }
+		{ algorithm: 'HS256', expiresIn: JWT_EXPIRES_IN },
 	);
 }
 
@@ -85,7 +85,7 @@ router.post('/login', validateLogin, async (req, res) => {
 
 		const user = db
 			.prepare(
-				'SELECT id, username, email, password FROM users WHERE email = ?'
+				'SELECT id, username, email, password FROM users WHERE email = ?',
 			)
 			.get(email.toLowerCase());
 
@@ -142,7 +142,7 @@ router.get('/me', authenticate, (req, res) => {
         SUM(CASE WHEN pinned = 1 AND archived = 0 THEN 1 ELSE 0 END) as pinned,
         SUM(CASE WHEN archived = 1 THEN 1 ELSE 0 END) as archived
       FROM notes WHERE user_id = ?
-    `
+    `,
 		)
 		.get(req.user.id);
 
@@ -186,7 +186,7 @@ router.put('/change-password', authenticate, async (req, res) => {
 		const hashedPassword = await bcrypt.hash(newPassword, BCRYPT_ROUNDS);
 		db.prepare('UPDATE users SET password = ? WHERE id = ?').run(
 			hashedPassword,
-			req.user.id
+			req.user.id,
 		);
 
 		return res.json({

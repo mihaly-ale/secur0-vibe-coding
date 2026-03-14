@@ -4,7 +4,7 @@
  */
 
 const jwt = require('jsonwebtoken');
-const { getDB } = require('../backend/database');
+const { getDB } = require('../database');
 
 const JWT_SECRET =
 	process.env.JWT_SECRET || 'fallback_secret_change_in_production';

@@ -33,7 +33,7 @@ app.use(
 			},
 		},
 		crossOriginEmbedderPolicy: false,
-	})
+	}),
 );
 
 // ─── CORS ──────────────────────────────────────────────────────────────────────
@@ -55,7 +55,7 @@ app.use(
 		credentials: true,
 		methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
 		allowedHeaders: ['Content-Type', 'Authorization'],
-	})
+	}),
 );
 
 // ─── Body Parsing ──────────────────────────────────────────────────────────────
@@ -102,7 +102,7 @@ app.use('/api/auth/register', authLimiter);
 
 // ─── Static Frontend ───────────────────────────────────────────────────────────
 
-const frontendPath = path.join(__dirname, './frontend');
+const frontendPath = path.join(__dirname, '..', 'frontend');
 app.use(express.static(frontendPath));
 
 // ─── API Routes ────────────────────────────────────────────────────────────────

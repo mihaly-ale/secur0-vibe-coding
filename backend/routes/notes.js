@@ -5,7 +5,7 @@
 
 const express = require('express');
 const xss = require('xss');
-const { getDB } = require('../backend/database');
+const { getDB } = require('../database');
 const { authenticate } = require('../middleware/auth');
 const {
 	validateCreateNote,
@@ -128,7 +128,7 @@ router.post('/', validateCreateNote, (req, res) => {
 				`
         INSERT INTO notes (user_id, title, content, color, pinned)
         VALUES (?, ?, ?, ?, ?)
-      `
+      `,
 			)
 			.run(req.user.id, title, content, color, pinned ? 1 : 0);
 
@@ -186,7 +186,7 @@ router.put('/:id', validateUpdateNote, (req, res) => {
 		values.push(req.params.id, req.user.id);
 
 		db.prepare(
-			`UPDATE notes SET ${fields.join(', ')} WHERE id = ? AND user_id = ?`
+			`UPDATE notes SET ${fields.join(', ')} WHERE id = ? AND user_id = ?`,
 		).run(...values);
 
 		const note = db
@@ -224,7 +224,7 @@ router.patch('/:id/pin', validateNoteId, (req, res) => {
 		const newPinned = note.pinned === 1 ? 0 : 1;
 		db.prepare('UPDATE notes SET pinned = ? WHERE id = ?').run(
 			newPinned,
-			note.id
+			note.id,
 		);
 
 		return res.json({
@@ -258,7 +258,7 @@ router.patch('/:id/archive', validateNoteId, (req, res) => {
 		const newArchived = note.archived === 1 ? 0 : 1;
 		db.prepare('UPDATE notes SET archived = ?, pinned = 0 WHERE id = ?').run(
 			newArchived,
-			note.id
+			note.id,
 		);
 
 		return res.json({
